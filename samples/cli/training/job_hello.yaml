@@ -1,0 +1,20 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+
+display_name: Saanika-Hello
+description: Sample yaml for job submission in Foundry from CLI
+ 
+command: echo "hello world"
+environment: mcr.microsoft.com/azureml/curated/acpt-pytorch-2.2-cuda12.1:48
+compute: /subscriptions/72c03bf3-4e69-41af-9532-dfcdc3eefef4/resourceGroups/computeinstance-e2e/providers/Microsoft.CognitiveServices/accounts/ragarg-wc-res/computes/testfoundrywcusclustercpu
+resources:
+  instance_count: 1
+  instance_type: Singularity.D4_v3
+  properties:
+    AISuperComputer:
+      imageVersion: ""
+      slaTier: Premium
+      priority: high
+environment_variables:
+  SINGULARITY_SIDECAR_CONSOLIDATION: "false"
+  AZUREML_CR_BOOTSTRAPPER_CONFIG_OVERRIDE: '{"capabilities_registry": {"registry": {"url": "fdpcommandbtestcanary.azurecr.io", "username": null, "password": null}, "repo_prefix": "datasetsbootstrapperoverride", "regional_tag_prefix": false}}'

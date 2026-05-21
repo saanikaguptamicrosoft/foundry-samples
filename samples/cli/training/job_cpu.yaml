@@ -1,0 +1,55 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+display_name: Saanika-services
+description: Testing command job in Foundry from CLI
+command: python ${{inputs.code_dataset}}/train.py --input-folder ${{inputs.train_data}} --input-file-name "sample.jsonl" --result-file ${{outputs.result_file}}
+# Custom (non-curated) MCR image — same code path as curated, just a different reference.
+environment: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04:latest
+compute: /subscriptions/72c03bf3-4e69-41af-9532-dfcdc3eefef4/resourcegroups/computeinstance-e2e/providers/microsoft.cognitiveservices/accounts/ragarg-wc-res/computes/testfoundrywcusclustercpu
+identity: /subscriptions/72c03bf3-4e69-41af-9532-dfcdc3eefef4/resourceGroups/shared-finetuning-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/fdp-command-job-westus2-mi
+resources:
+  instance_count: 1
+  instance_type: Singularity.D4_v3
+  properties:
+    AISuperComputer:
+      imageVersion: ""
+      slaTier: Premium
+      priority: high
+distribution:
+  type: ray
+  port: 6379
+  include_dashboard: true
+  dashboard_port: 8265
+  head_node_additional_args: "--num-cpus=2"
+  worker_node_additional_args: "--num-cpus=2"
+inputs:
+  train_data:
+    type: uri_folder
+    path: .\train_data
+    mode: download
+  code_dataset:
+    type: uri_folder
+    path: .\src
+    mode: download
+outputs:
+  result_file:
+    type: uri_folder
+environment_variables:
+  AZUREML_CR_BOOTSTRAPPER_CONFIG_OVERRIDE: '{"capabilities_registry": {"registry": {"url": "fdpcommandbtestcanary.azurecr.io", "username": null, "password": null}, "repo_prefix": "datasetsbootstrapperoverride", "regional_tag_prefix": false}}'
+  SINGULARITY_SIDECAR_CONSOLIDATION: "false"
+services:
+  my_ssh:
+    type: ssh
+    ssh_public_keys: "ssh-ed25519 <REDACTED>"
+  my_jupyter:
+    type: jupyter_lab
+  my_tensorboard:
+    type: tensor_board
+    log_dir: "outputs/tblogs"
+  my_vscode:
+    type: vs_code
+  my_custom:
+    type: custom
+    port: 9090
+    properties:
+      note: "arbitrary passthrough"
